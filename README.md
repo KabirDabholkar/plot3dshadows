@@ -19,7 +19,7 @@ pip install plot3dshadows
 
 ### From Source
 ```bash
-git clone https://github.com/yourusername/plot3dshadows.git
+git clone https://github.com/KabirDabholkar/plot3dshadows.git
 cd plot3dshadows
 pip install -e .
 ```

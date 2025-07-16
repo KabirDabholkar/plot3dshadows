@@ -26,10 +26,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/plot3dshadows"
-Documentation = "https://github.com/yourusername/plot3dshadows#readme"
-Repository = "https://github.com/yourusername/plot3dshadows"
-"Bug Tracker" = "https://github.com/yourusername/plot3dshadows/issues"
+Homepage = "https://github.com/KabirDabholkar/plot3dshadows"
+Documentation = "https://github.com/KabirDabholkar/plot3dshadows#readme"
+Repository = "https://github.com/KabirDabholkarplot3dshadows"
+"Bug Tracker" = "https://github.com/KabirDabholkar/plot3dshadows/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
