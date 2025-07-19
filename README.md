@@ -5,10 +5,10 @@ A Python package for creating beautiful 3D plots with automatic shadows projecte
 ## Example Plots
 
 ### Basic Example
-![Basic Example](test_plots/basic_example.png)
+<img src="test_plots/basic_example.png" width="400">
 
 ### Advanced Example
-![Advanced Example](test_plots/advanced_example.png)
+<img src="test_plots/advanced_example.png" width="400">
 
 
 ## Features
