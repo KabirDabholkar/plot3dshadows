@@ -2,6 +2,15 @@
 
 A Python package for creating beautiful 3D plots with automatic shadows projected onto coordinate planes using matplotlib.
 
+## Example Plots
+
+### Basic Example
+![Basic Example](test_plots/basic_example.png)
+
+### Advanced Example
+![Advanced Example](test_plots/advanced_example.png)
+
+
 ## Features
 
 - **Automatic Shadow Generation**: Automatically projects 3D data onto coordinate planes as shadows
@@ -22,41 +31,6 @@ pip install plot3dshadows
 git clone https://github.com/KabirDabholkar/plot3dshadows.git
 cd plot3dshadows
 pip install -e .
-```
-
-## Quick Start
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from plot3dshadows import Plot3DShadows
-
-# Create a 3D figure
-fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
-
-# Create the Plot3DShadows object
-plotter = Plot3DShadows(
-    ax, 
-    shadow_alpha_ratio=0.3,
-    shadow_planes=['xy', 'xz', 'yz'],
-    shadow_positions={'xy': 'min', 'xz': 'min', 'yz': 'min'}
-)
-
-# Generate some data
-t = np.linspace(0, 4*np.pi, 100)
-x = np.cos(t)
-y = np.sin(t)
-z = t / (4*np.pi)
-
-# Plot with shadows
-plotter.plot(x, y, z, color='blue', linewidth=2, label='3D Spiral')
-plotter.plot_shadows()  # Add shadows
-
-# Customize the plot
-plotter.set_labels('X', 'Y', 'Z')
-plotter.set_title('3D Plot with Shadows')
-plt.show()
 ```
 
 ## Usage
@@ -149,76 +123,10 @@ plotter.set_shadow_positions({'xy': 'max', 'xz': 'min'})
 
 ## Examples
 
-### Example 1: 3D Spiral with Shadows
+See the `examples/` directory for complete working examples:
 
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from plot3dshadows import Plot3DShadows
-
-# Setup
-fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
-ax.set_xlim(-2, 2)
-ax.set_ylim(-2, 2)
-ax.set_zlim(0, 4)
-
-# Create plotter
-plotter = Plot3DShadows(ax, shadow_alpha_ratio=0.3)
-
-# Generate spiral data
-t = np.linspace(0, 4*np.pi, 100)
-x = np.cos(t)
-y = np.sin(t)
-z = t / (4*np.pi) * 4
-
-# Plot with shadows
-plotter.plot(x, y, z, color='blue', linewidth=2)
-plotter.plot_shadows()
-plotter.set_labels('X', 'Y', 'Z')
-plotter.set_title('3D Spiral with Shadows')
-
-plt.show()
-```
-
-### Example 2: Scatter Plot with Custom Shadow Configuration
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from plot3dshadows import Plot3DShadows
-
-# Setup
-fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
-ax.set_xlim(-3, 3)
-ax.set_ylim(-3, 3)
-ax.set_zlim(-3, 3)
-
-# Create plotter with custom shadow configuration
-plotter = Plot3DShadows(
-    ax, 
-    shadow_alpha_ratio=0.2,
-    shadow_planes=['xy', 'yz'],  # Only xy and yz shadows
-    shadow_positions={'xy': 'min', 'yz': 'max'}  # xy at bottom, yz at back
-)
-
-# Generate random data
-np.random.seed(42)
-n_points = 50
-x = np.random.randn(n_points)
-y = np.random.randn(n_points)
-z = np.random.randn(n_points)
-
-# Plot with shadows
-plotter.scatter(x, y, z, color='red', s=50, alpha=0.7)
-plotter.plot_shadows()
-plotter.plot_axes(partial=0.8)
-plotter.set_labels('X', 'Y', 'Z')
-plotter.set_title('Scatter Plot with Custom Shadows')
-
-plt.show()
-```
+- `examples/basic_example.py` - Simple 3D spiral with shadows
+- `examples/advanced_example.py` - Scatter plot with custom shadow configuration
 
 ## API Reference
 
@@ -249,16 +157,3 @@ Plot3DShadows(ax, shadow_alpha_ratio=0.3, shadow_planes=['xy', 'xz', 'yz'],
 - `set_shadow_positions(shadow_positions)`: Update shadow positions
 - `plot_axes(partial=1)`: Plot coordinate axes
 - `plot_planes()`: Plot coordinate planes
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Built on top of matplotlib's excellent 3D plotting capabilities
-- Inspired by the need for better 3D visualization with depth cues 

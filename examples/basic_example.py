@@ -51,15 +51,14 @@ def main():
     
     # Now plot all shadows at the current axis limits
     plotter.plot_shadows()
+    plotter.plot_planes()
     plotter.plot_axes(partial=0.5)
     
     # Set labels and title
     plotter.set_labels('X', 'Y', 'Z')
-    plotter.set_title('3D Plot with Shadows')
     
     plt.tight_layout()
-    plt.savefig('basic_example.png', dpi=100, bbox_inches='tight')
-    plt.show()
+    plt.savefig('test_plots/basic_example.png', dpi=100, bbox_inches='tight')
 
 if __name__ == "__main__":
     main() 

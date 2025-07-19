@@ -231,17 +231,26 @@ class Plot3DShadows:
     def plot_planes(self):
         """
         Plot the planes for the 3D plot.
+        Only plots planes that correspond to shadow planes.
         """
-        # Plot plane at z_min
         x_min, x_max = self.ax.get_xlim()
         y_min, y_max = self.ax.get_ylim()
         z_min, z_max = self.ax.get_zlim()
         
-        xx, yy = np.meshgrid(np.array([x_min, x_max]), np.array([y_min, y_max]))
-        zz = np.full_like(xx, z_min)
-        self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray')
+        # Plot xy plane if it's in shadow_planes
+        if 'xy' in self.shadow_planes:
+            xx, yy = np.meshgrid(np.array([x_min, x_max]), np.array([y_min, y_max]))
+            zz = np.full_like(xx, z_min)
+            self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray')
 
-        # Plot plane at x_min
-        yy, zz = np.meshgrid(np.array([y_min, y_max]), np.array([z_min, z_max]))
-        xx = np.full_like(yy, x_min)
-        self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray') 
+        # Plot xz plane if it's in shadow_planes
+        if 'xz' in self.shadow_planes:
+            xx, zz = np.meshgrid(np.array([x_min, x_max]), np.array([z_min, z_max]))
+            yy = np.full_like(xx, y_min)
+            self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray')
+
+        # Plot yz plane if it's in shadow_planes
+        if 'yz' in self.shadow_planes:
+            yy, zz = np.meshgrid(np.array([y_min, y_max]), np.array([z_min, z_max]))
+            xx = np.full_like(yy, x_min)
+            self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray') 
