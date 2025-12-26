@@ -21,12 +21,6 @@ A Python package for creating beautiful 3D plots with automatic shadows projecte
 
 ## Installation
 
-### From PyPI (when published)
-```bash
-pip install plot3dshadows
-```
-
-### From Source
 ```bash
 git clone https://github.com/KabirDabholkar/plot3dshadows.git
 cd plot3dshadows
