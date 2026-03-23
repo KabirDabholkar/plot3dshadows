@@ -198,7 +198,7 @@ class Plot3DShadows:
         
         self.shadow_positions.update(shadow_positions)
 
-    def plot_axes(self, partial=1):
+    def plot_axes(self, partial=1, linewidth=2):
         """
         Plot the axes for the 3D plot.
         
@@ -206,6 +206,8 @@ class Plot3DShadows:
         -----------
         partial : float
             Fraction to shorten the axes by (default: 1)
+        linewidth : float
+            Line width for drawn axes (default: 2)
         """
         x_min, x_max = self.ax.get_xlim()
         y_min, y_max = self.ax.get_ylim()
@@ -220,13 +222,13 @@ class Plot3DShadows:
         # Plot the three axes from origin
         self.ax.plot([origin[0], origin[0] + x_dev[0]], 
                     [origin[1], origin[1] + x_dev[1]], 
-                    [origin[2], origin[2] + x_dev[2]], color='black', linewidth=2)
+                    [origin[2], origin[2] + x_dev[2]], color='black', linewidth=linewidth)
         self.ax.plot([origin[0], origin[0] + y_dev[0]], 
                     [origin[1], origin[1] + y_dev[1]], 
-                    [origin[2], origin[2] + y_dev[2]], color='black', linewidth=2)
+                    [origin[2], origin[2] + y_dev[2]], color='black', linewidth=linewidth)
         self.ax.plot([origin[0], origin[0] + z_dev[0]], 
                     [origin[1], origin[1] + z_dev[1]], 
-                    [origin[2], origin[2] + z_dev[2]], color='black', linewidth=2)
+                    [origin[2], origin[2] + z_dev[2]], color='black', linewidth=linewidth)
 
     def plot_planes(self):
         """
