@@ -85,6 +85,18 @@ plotter = Plot3DShadows(ax, shadow_alpha_ratio=0.3)
 plotter = Plot3DShadows(ax, shadow_alpha_ratio=0.5)
 ```
 
+#### Camera-Aware Backdrop Placement
+Keep shadows, helper axes, and helper planes on the side opposite the camera:
+
+```python
+plotter = Plot3DShadows(ax, camera_aware_backdrop=True)
+
+plotter.plot(x, y, z, color='blue')
+plotter.plot_shadows()   # Uses camera-opposite side
+plotter.plot_axes()      # Starts from camera-opposite corner
+plotter.plot_planes()    # Draws helper planes on the far side
+```
+
 ### Advanced Features
 
 #### Per-Plot Shadow Control
@@ -132,7 +144,8 @@ The main class for 3D plotting with shadows.
 
 ```python
 Plot3DShadows(ax, shadow_alpha_ratio=0.3, shadow_planes=['xy', 'xz', 'yz'], 
-              shadow_positions={'xy': 'min', 'xz': 'min', 'yz': 'min'})
+              shadow_positions={'xy': 'min', 'xz': 'min', 'yz': 'min'},
+              camera_aware_backdrop=False)
 ```
 
 **Parameters:**
@@ -140,6 +153,7 @@ Plot3DShadows(ax, shadow_alpha_ratio=0.3, shadow_planes=['xy', 'xz', 'yz'],
 - `shadow_alpha_ratio`: float - Ratio to multiply original alpha by for shadows (default: 0.3)
 - `shadow_planes`: list - List of shadow planes to plot (default: ['xy', 'xz', 'yz'])
 - `shadow_positions`: dict - Shadow positions for each plane (default: {'xy': 'min', 'xz': 'min', 'yz': 'min'})
+- `camera_aware_backdrop`: bool - Place shadows/axes/planes on the side opposite the current camera view (default: False)
 
 #### Methods
 

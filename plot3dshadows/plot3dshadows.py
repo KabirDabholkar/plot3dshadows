@@ -10,8 +10,9 @@ class Plot3DShadows:
     3D data with automatic shadows projected onto the coordinate planes.
     """
     
-    def __init__(self, ax, shadow_alpha_ratio=0.3, shadow_planes=['xy', 'xz', 'yz'], 
-                 shadow_positions={'xy': 'min', 'xz': 'min', 'yz': 'min'}):
+    def __init__(self, ax, shadow_alpha_ratio=0.3, shadow_planes=['xy', 'xz', 'yz'],
+                 shadow_positions={'xy': 'min', 'xz': 'min', 'yz': 'min'},
+                 camera_aware_backdrop=False):
         """
         Initialize the Plot3DShadows object.
         
@@ -28,11 +29,15 @@ class Plot3DShadows:
             Dictionary specifying whether to project shadows at 'min' or 'max' 
             for each plane. Keys: 'xy', 'xz', 'yz'. Values: 'min' or 'max'
             (default: {'xy': 'min', 'xz': 'min', 'yz': 'min'})
+        camera_aware_backdrop : bool, optional
+            If True, automatically place shadows, axes, and planes on the side
+            opposite the current camera direction (default: False)
         """
         self.ax = ax
         self.shadow_alpha_ratio = shadow_alpha_ratio
         self.shadow_planes = shadow_planes
         self.shadow_positions = shadow_positions
+        self.camera_aware_backdrop = camera_aware_backdrop
         
         # Store plot data for shadow plotting
         self.scatter_data = []
@@ -49,6 +54,39 @@ class Plot3DShadows:
         for plane, position in self.shadow_positions.items():
             if position not in valid_positions:
                 raise ValueError(f"Invalid shadow position '{position}' for plane '{plane}'. Must be one of {valid_positions}")
+
+    def _get_backdrop_positions(self):
+        """
+        Return plane positions ('min'/'max') for xy/xz/yz backdrop placement.
+        """
+        if not self.camera_aware_backdrop:
+            return {
+                'xy': self.shadow_positions.get('xy', 'min'),
+                'xz': self.shadow_positions.get('xz', 'min'),
+                'yz': self.shadow_positions.get('yz', 'min')
+            }
+
+        azim_deg = self.ax.azim if self.ax.azim is not None else -60.0
+        elev_deg = self.ax.elev if self.ax.elev is not None else 30.0
+        azim = np.deg2rad(azim_deg)
+        elev = np.deg2rad(elev_deg)
+
+        # Approximate camera direction in data coordinates.
+        cam_dir = {
+            'x': np.cos(elev) * np.cos(azim),
+            'y': np.cos(elev) * np.sin(azim),
+            'z': np.sin(elev)
+        }
+
+        def away_from_camera(component):
+            return 'min' if component >= 0 else 'max'
+
+        # Plane side is chosen along its normal axis.
+        return {
+            'xy': away_from_camera(cam_dir['z']),
+            'xz': away_from_camera(cam_dir['y']),
+            'yz': away_from_camera(cam_dir['x'])
+        }
     
     def scatter(self, x, y, z, shadow_alpha_ratio=None, **kwargs):
         """
@@ -109,11 +147,13 @@ class Plot3DShadows:
         y_min, y_max = self.ax.get_ylim()
         z_min, z_max = self.ax.get_zlim()
         
+        backdrop_positions = self._get_backdrop_positions()
+
         # Define shadow plane configurations
         plane_configs = {
-            'xy': {'x': lambda x: x, 'y': lambda y: y, 'z': lambda z: np.full_like(z, z_min if self.shadow_positions.get('xy', 'min') == 'min' else z_max)},
-            'xz': {'x': lambda x: x, 'y': lambda y: np.full_like(y, y_min if self.shadow_positions.get('xz', 'min') == 'min' else y_max), 'z': lambda z: z},
-            'yz': {'x': lambda x: np.full_like(x, x_min if self.shadow_positions.get('yz', 'min') == 'min' else x_max), 'y': lambda y: y, 'z': lambda z: z}
+            'xy': {'x': lambda x: x, 'y': lambda y: y, 'z': lambda z: np.full_like(z, z_min if backdrop_positions.get('xy', 'min') == 'min' else z_max)},
+            'xz': {'x': lambda x: x, 'y': lambda y: np.full_like(y, y_min if backdrop_positions.get('xz', 'min') == 'min' else y_max), 'z': lambda z: z},
+            'yz': {'x': lambda x: np.full_like(x, x_min if backdrop_positions.get('yz', 'min') == 'min' else x_max), 'y': lambda y: y, 'z': lambda z: z}
         }
         
         def prepare_shadow_kwargs(data):
@@ -212,12 +252,25 @@ class Plot3DShadows:
         x_min, x_max = self.ax.get_xlim()
         y_min, y_max = self.ax.get_ylim()
         z_min, z_max = self.ax.get_zlim()
-        
-        # Define origin point and deviations
-        origin = [x_min, y_min, z_min]
-        x_dev = [partial * (x_max - x_min), 0, 0]
-        y_dev = [0, partial * (y_max - y_min), 0] 
-        z_dev = [0, 0, partial * (z_max - z_min)]
+
+        backdrop_positions = self._get_backdrop_positions()
+        x_side = backdrop_positions['yz']
+        y_side = backdrop_positions['xz']
+        z_side = backdrop_positions['xy']
+
+        # Define origin point and direction signs from the far-side corner.
+        origin = [
+            x_min if x_side == 'min' else x_max,
+            y_min if y_side == 'min' else y_max,
+            z_min if z_side == 'min' else z_max
+        ]
+        x_sign = 1 if x_side == 'min' else -1
+        y_sign = 1 if y_side == 'min' else -1
+        z_sign = 1 if z_side == 'min' else -1
+
+        x_dev = [x_sign * partial * (x_max - x_min), 0, 0]
+        y_dev = [0, y_sign * partial * (y_max - y_min), 0]
+        z_dev = [0, 0, z_sign * partial * (z_max - z_min)]
         
         # Plot the three axes from origin
         self.ax.plot([origin[0], origin[0] + x_dev[0]], 
@@ -238,21 +291,25 @@ class Plot3DShadows:
         x_min, x_max = self.ax.get_xlim()
         y_min, y_max = self.ax.get_ylim()
         z_min, z_max = self.ax.get_zlim()
+        backdrop_positions = self._get_backdrop_positions()
         
         # Plot xy plane if it's in shadow_planes
         if 'xy' in self.shadow_planes:
             xx, yy = np.meshgrid(np.array([x_min, x_max]), np.array([y_min, y_max]))
-            zz = np.full_like(xx, z_min)
+            zz_value = z_min if backdrop_positions['xy'] == 'min' else z_max
+            zz = np.full_like(xx, zz_value)
             self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray')
 
         # Plot xz plane if it's in shadow_planes
         if 'xz' in self.shadow_planes:
             xx, zz = np.meshgrid(np.array([x_min, x_max]), np.array([z_min, z_max]))
-            yy = np.full_like(xx, y_min)
+            yy_value = y_min if backdrop_positions['xz'] == 'min' else y_max
+            yy = np.full_like(xx, yy_value)
             self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray')
 
         # Plot yz plane if it's in shadow_planes
         if 'yz' in self.shadow_planes:
             yy, zz = np.meshgrid(np.array([y_min, y_max]), np.array([z_min, z_max]))
-            xx = np.full_like(yy, x_min)
-            self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray') 
+            xx_value = x_min if backdrop_positions['yz'] == 'min' else x_max
+            xx = np.full_like(yy, xx_value)
+            self.ax.plot_surface(xx, yy, zz, alpha=0.1, color='gray')

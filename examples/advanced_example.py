@@ -29,6 +29,7 @@ def main():
         ax, 
         shadow_alpha_ratio=0.1,
         shadow_planes=['xy', 'xz', 'yz'],
+        camera_aware_backdrop=True,
         shadow_positions={
             'xy': 'min',  # Bottom plane
             'xz': 'min',  # Side plane  
